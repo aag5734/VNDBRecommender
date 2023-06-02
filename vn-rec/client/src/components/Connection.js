@@ -1,4 +1,4 @@
-export function getUser(username) {
+export function getUser(username, callback) {
     var query = 'https://api.vndb.org/kana/user?q=' + username;
     var request = new XMLHttpRequest();
     request.open('GET', query, true);
@@ -6,8 +6,8 @@ export function getUser(username) {
 
     request.onload = function () {
         console.log(this.response);
-        var data = JSON.parse(this.response);
+        const data = JSON.parse(this.response);
 
-        console.log(data)
+        callback(data[username]);
     }
 }

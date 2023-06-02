@@ -11,15 +11,26 @@ import 'primeicons/primeicons.css';
 
 function App() {
   const [showVNS, setShowVNS] = useState(false);
+  const [showError, setShowError] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const formSubmit = (e) => {
-    // e.preventDefault();
     if (formik.values.username.length !== 0) {
-      setShowVNS(true);
-      getUser(formik.values.username);
+      getUser(formik.values.username, function(data) {
+        if (data === null) {
+          setErrorMsg("That user doesn't exist.")
+          setShowError(true);
+          setShowVNS(false);
+        } else {
+          setShowError(false);
+          setShowVNS(true);
+        }
+      });
+    } else {
+      setErrorMsg("Please enter your VNDB username");
+      setShowError(true);
+      setShowVNS(false);
     }
-
-    // setUsername("");
   }
 
   const githubRedirect = (e) => {
@@ -36,6 +47,12 @@ function App() {
   const SuggestedVNS = () => (
     <div className='suggested'>
       Testing!
+    </div>
+  )
+
+  const InputError = () => (
+    <div className='input-error'>
+      {errorMsg}
     </div>
   )
 
@@ -62,6 +79,7 @@ function App() {
           <Button type="submit">Submit</Button>
         </form>
         <br/>
+        {showError ? <InputError/> : null}
         {showVNS ? <SuggestedVNS/> : null}
       </header>
     </div>
