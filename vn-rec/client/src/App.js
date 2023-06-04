@@ -4,7 +4,7 @@ import {useFormik} from "formik"
 import './App.css';
 import {InputText} from 'primereact/inputtext';
 import { Button } from 'primereact/button';
-import { getUser } from './components/Connection';
+import { getUserList } from './components/Connection';
 import "primereact/resources/themes/lara-light-indigo/theme.css";     
 import "primereact/resources/primereact.min.css";
 import 'primeicons/primeicons.css';                                  
@@ -13,15 +13,18 @@ function App() {
   const [showVNS, setShowVNS] = useState(false);
   const [showError, setShowError] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [userList, setUserList] = useState(null);
+
 
   const formSubmit = (e) => {
     if (formik.values.username.length !== 0) {
-      getUser(formik.values.username, function(data) {
+      getUserList(formik.values.username, function(data) {
         if (data === null) {
           setErrorMsg("That user doesn't exist.")
           setShowError(true);
           setShowVNS(false);
         } else {
+          setUserList(data);
           setShowError(false);
           setShowVNS(true);
         }
