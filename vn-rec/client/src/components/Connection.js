@@ -1,3 +1,7 @@
+function getSuggestedVNS() {
+    
+}
+
 function getUserID(username, callback) {
     var query = 'https://api.vndb.org/kana/user?q=' + username;
     var request = new XMLHttpRequest();
@@ -6,7 +10,6 @@ function getUserID(username, callback) {
     request.send();
 
     request.onload = function () {
-        console.log(this.response);
         const data = JSON.parse(this.response);
         if (data[username] === null) {
             callback("notarealid");
@@ -38,7 +41,6 @@ export function getUserList(username, callback) {
             if (userID === "notarealid") {
                 callback(null);
             } else {
-                console.log(this.response);
                 const data = JSON.parse(this.response);
                 callback(data.results);
             }

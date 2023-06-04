@@ -1,11 +1,12 @@
 import rena from './assets/rena.jpg';
-import React, {useState} from "react";
+import React, {useRef, useState} from "react";
 import {useFormik} from "formik"
 import './App.css';
 import {InputText} from 'primereact/inputtext';
 import { Button } from 'primereact/button';
+import { Toast } from 'primereact/toast';
 import { getUserList } from './components/Connection';
-import "primereact/resources/themes/lara-light-indigo/theme.css";     
+import "primereact/resources/themes/lara-dark-purple/theme.css";     
 import "primereact/resources/primereact.min.css";
 import 'primeicons/primeicons.css';                                  
 
@@ -14,23 +15,37 @@ function App() {
   const [showError, setShowError] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [userList, setUserList] = useState(null);
+  const toast = useRef(null);
+
+  const getTopTags = (e) => {
+    console.log(userList);
+  }
 
 
   const formSubmit = (e) => {
     if (formik.values.username.length !== 0) {
       getUserList(formik.values.username, function(data) {
         if (data === null) {
-          setErrorMsg("That user doesn't exist.")
+          toast.current.show({
+             severity: 'error',
+             summary: 'Error',
+             detail: "User doesn't exist"
+          });
           setShowError(true);
           setShowVNS(false);
         } else {
           setUserList(data);
           setShowError(false);
           setShowVNS(true);
+          getTopTags();
         }
       });
     } else {
-      setErrorMsg("Please enter your VNDB username");
+      toast.current.show({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Enter your VNDB username'
+     });
       setShowError(true);
       setShowVNS(false);
     }
@@ -49,7 +64,12 @@ function App() {
 
   const SuggestedVNS = () => (
     <div className='suggested'>
-      Testing!
+      Because you're a fan of TOPVNSHERE:
+      <ul>
+        <li>Thing 1</li>
+        <li>Thing 2</li>
+        <li>Thing 3</li>
+      </ul>
     </div>
   )
 
@@ -79,6 +99,7 @@ function App() {
               value={formik.values.username}
             />
           </span>
+          <Toast ref={toast} />
           <Button type="submit">Submit</Button>
         </form>
         <br/>
