@@ -5,14 +5,18 @@ import './App.css';
 import {InputText} from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
-import { getUserList } from './components/Connection';
+import { DataView } from 'primereact/dataview';
+import { getUserList, getSuggestedVNS } from './components/Connection';
 import "primereact/resources/themes/lara-dark-purple/theme.css";     
 import "primereact/resources/primereact.min.css";
-import 'primeicons/primeicons.css';                                  
+import 'primeicons/primeicons.css';       
+import 'primeflex/primeflex.css';                           
 
 function App() {
   const [showVNS, setShowVNS] = useState(false);
   const [userList, setUserList] = useState(null);
+  const topFiftyTags = [];
+  const [recommendedVNS, setVNS] = useState([]);
   const tagDict = {};
   const toast = useRef(null);
 
@@ -28,28 +32,34 @@ function App() {
           setShowVNS(false);
         } else {
           setUserList(data);
-          setShowVNS(true);
           for (let i = 0; i < data.length; i++) {
             for (let j = 0; j < data[i].vn.tags.length; j++) {
-              if (!tagDict.hasOwnProperty(data[i].vn.tags[j].name)) {
-                tagDict[data[i].vn.tags[j].name] = "1";
+              if (!tagDict.hasOwnProperty(data[i].vn.tags[j].id)) {
+                tagDict[data[i].vn.tags[j].id] = "1";
               } else {
-                let newVal = (parseInt(tagDict[data[i].vn.tags[j].name]) + 1).toString();
-                tagDict[data[i].vn.tags[j].name] = newVal;
+                let newVal = (parseInt(tagDict[data[i].vn.tags[j].id]) + 1).toString();
+                tagDict[data[i].vn.tags[j].id] = newVal;
               }
             }
           }
-          let sortedTags = [];
           for (var tag in tagDict) {
-              if (sortedTags.length === 50) {
+              if (topFiftyTags.length === 50) {
                 break;
               }
-              sortedTags.push([tag, tagDict[tag]]);
+              topFiftyTags.push([tag, tagDict[tag]]);
           }
-          sortedTags.sort(function(a, b) {
+          topFiftyTags.sort(function(a, b) {
               return b[1] - a[1];
           });
-          console.log(sortedTags);
+          console.log(topFiftyTags);
+          let tags = []
+          while (tags.length !== 10) {
+            tags.push(topFiftyTags[Math.floor(Math.random() * topFiftyTags.length)]);
+          }
+          getSuggestedVNS(tags, function(data) {
+            setVNS(data.results);
+          })
+          setShowVNS(true);
         }
       });
     } else {
@@ -73,14 +83,36 @@ function App() {
     onSubmit: formSubmit
   });
 
+  const itemTemplate = (vn) => {
+    return (
+      <div className="col-12">
+        <div className="flex flex-column xl:flex-row xl:align-items-start p-4 gap-4">
+            <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={vn.image.url} alt={vn.title} />
+            <div className="flex flex-column sm:flex-row justify-content-between align-items-center xl:align-items-start flex-1 gap-4">
+                <div className="flex flex-column align-items-center sm:align-items-start gap-3">
+                    <div className="text-2xl font-bold text-900">{vn.title}</div>
+                    {/* <Rating value={product.rating} readOnly cancel={false}></Rating> */}
+                    {/* <div className="flex align-items-center gap-3">
+                        <span className="flex align-items-center gap-2">
+                            <i className="pi pi-tag"></i>
+                            <span className="font-semibold">{product.category}</span>
+                        </span>
+                        <Tag value={product.inventoryStatus} severity={getSeverity(product)}></Tag>
+                    </div> */}
+                </div>
+                {/* <div className="flex sm:flex-column align-items-center sm:align-items-end gap-3 sm:gap-2">
+                    <span className="text-2xl font-semibold">${product.price}</span>
+                    <Button icon="pi pi-shopping-cart" className="p-button-rounded" disabled={product.inventoryStatus === 'OUTOFSTOCK'}></Button>
+                </div> */}
+            </div>
+        </div>
+        </div>
+    );
+  }
+
   const SuggestedVNS = () => (
-    <div className='suggested'>
-      Because you're a fan of TOPVNSHERE:
-      <ul>
-        <li>Thing 1</li>
-        <li>Thing 2</li>
-        <li>Thing 3</li>
-      </ul>
+    <div className="suggested">
+      <DataView value={recommendedVNS} itemTemplate={itemTemplate} />
     </div>
   )
 
