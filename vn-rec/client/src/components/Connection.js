@@ -1,5 +1,5 @@
-function getSuggestedVNS() {
-    
+function getSuggestedVNS(tags) {
+        
 }
 
 function getUserID(username, callback) {

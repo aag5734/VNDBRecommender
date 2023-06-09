@@ -12,15 +12,9 @@ import 'primeicons/primeicons.css';
 
 function App() {
   const [showVNS, setShowVNS] = useState(false);
-  const [showError, setShowError] = useState(false);
-  const [errorMsg, setErrorMsg] = useState("");
   const [userList, setUserList] = useState(null);
+  const tagDict = {};
   const toast = useRef(null);
-
-  const getTopTags = (e) => {
-    console.log(userList);
-  }
-
 
   const formSubmit = (e) => {
     if (formik.values.username.length !== 0) {
@@ -31,13 +25,31 @@ function App() {
              summary: 'Error',
              detail: "User doesn't exist"
           });
-          setShowError(true);
           setShowVNS(false);
         } else {
           setUserList(data);
-          setShowError(false);
           setShowVNS(true);
-          getTopTags();
+          for (let i = 0; i < data.length; i++) {
+            for (let j = 0; j < data[i].vn.tags.length; j++) {
+              if (!tagDict.hasOwnProperty(data[i].vn.tags[j].name)) {
+                tagDict[data[i].vn.tags[j].name] = "1";
+              } else {
+                let newVal = (parseInt(tagDict[data[i].vn.tags[j].name]) + 1).toString();
+                tagDict[data[i].vn.tags[j].name] = newVal;
+              }
+            }
+          }
+          let sortedTags = [];
+          for (var tag in tagDict) {
+              if (sortedTags.length === 50) {
+                break;
+              }
+              sortedTags.push([tag, tagDict[tag]]);
+          }
+          sortedTags.sort(function(a, b) {
+              return b[1] - a[1];
+          });
+          console.log(sortedTags);
         }
       });
     } else {
@@ -46,7 +58,6 @@ function App() {
         summary: 'Error',
         detail: 'Enter your VNDB username'
      });
-      setShowError(true);
       setShowVNS(false);
     }
   }
@@ -70,12 +81,6 @@ function App() {
         <li>Thing 2</li>
         <li>Thing 3</li>
       </ul>
-    </div>
-  )
-
-  const InputError = () => (
-    <div className='input-error'>
-      {errorMsg}
     </div>
   )
 
@@ -103,7 +108,6 @@ function App() {
           <Button type="submit">Submit</Button>
         </form>
         <br/>
-        {showError ? <InputError/> : null}
         {showVNS ? <SuggestedVNS/> : null}
       </header>
     </div>
