@@ -4,8 +4,6 @@ export function getSuggestedVNS(tags, callback) {
     request.open('POST', query, true);
     request.setRequestHeader('Content-Type', 'application/json');
 
-    console.log(tags);
-
     const reqArgs = {
         filters: ["or"
         , ["tag","=",tags[0]]
@@ -27,27 +25,10 @@ export function getSuggestedVNS(tags, callback) {
     request.onload = function () {
         const data = JSON.parse(this.response);
         callback(data);
-        // let count = 0;
-        // console.log(data.results);
-        // for (let tag of tags) {
-        //     for (let otherTag of data.results[0].tags) {
-        //         if (tag === otherTag.name) {
-        //             count++;
-        //         }
-        //     }
-        // }
-        // console.log(((count / tags.length) * 100));
-        // if (((count / tags.length) * 100) >= 50) {
-        //     console.log("lol");
-        //     topTen[data.results.title] = (count / tags.length) * 100;
-        // }
-        // if (Object.keys(topTen).length === 10) {
-        //     callback(topTen);
-        // }
-        // getSuggestedVNS(tags, topTen);
     }
 }
 
+// returns the user's vndb id
 function getUserID(username, callback) {
     var query = 'https://api.vndb.org/kana/user?q=' + username;
     var request = new XMLHttpRequest();
@@ -65,6 +46,7 @@ function getUserID(username, callback) {
     }
 }
 
+// returns a list of the user's rated visual novels
 export function getUserList(username, callback) {
     var query = 'https://api.vndb.org/kana/ulist';
     var request = new XMLHttpRequest();

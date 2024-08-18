@@ -20,6 +20,8 @@ function App() {
   const tagDict = {};
   const toast = useRef(null);
 
+  // Handles form submission and makes calls to Kana API to get a list of
+  // recomended visual novels
   const formSubmit = (e) => {
     if (formik.values.username.length !== 0) {
       getUserList(formik.values.username, function(data) {
@@ -32,6 +34,9 @@ function App() {
           setShowVNS(false);
         } else {
           setUserList(data);
+          // goes through each tag in the user's visual novel list and places
+          // them into a dictionary, with the key being the tag id and the value
+          // being the number of times the tag appears
           for (let i = 0; i < data.length; i++) {
             for (let j = 0; j < data[i].vn.tags.length; j++) {
               if (!tagDict.hasOwnProperty(data[i].vn.tags[j].id)) {
@@ -42,6 +47,7 @@ function App() {
               }
             }
           }
+          // using the tag dictionary to get the user's top 50 tags
           for (var tag in tagDict) {
               if (topFiftyTags.length === 50) {
                 break;
@@ -51,7 +57,7 @@ function App() {
           topFiftyTags.sort(function(a, b) {
               return b[1] - a[1];
           });
-          console.log(topFiftyTags);
+          // using the top ten tags to create a curated list of suggested visual novels
           let tags = []
           while (tags.length !== 10) {
             tags.push(topFiftyTags[Math.floor(Math.random() * topFiftyTags.length)]);
@@ -78,11 +84,12 @@ function App() {
 
   const formik = useFormik({
     initialValues: {
-      username:''
+      username: '',
     },
     onSubmit: formSubmit
   });
 
+  // visual novel block element
   const itemTemplate = (vn) => {
     return (
       <div className="col-12">
@@ -91,19 +98,7 @@ function App() {
             <div className="flex flex-column sm:flex-row justify-content-between align-items-center xl:align-items-start flex-1 gap-4">
                 <div className="flex flex-column align-items-center sm:align-items-start gap-3">
                     <div className="text-2xl font-bold text-900">{vn.title}</div>
-                    {/* <Rating value={product.rating} readOnly cancel={false}></Rating> */}
-                    {/* <div className="flex align-items-center gap-3">
-                        <span className="flex align-items-center gap-2">
-                            <i className="pi pi-tag"></i>
-                            <span className="font-semibold">{product.category}</span>
-                        </span>
-                        <Tag value={product.inventoryStatus} severity={getSeverity(product)}></Tag>
-                    </div> */}
                 </div>
-                {/* <div className="flex sm:flex-column align-items-center sm:align-items-end gap-3 sm:gap-2">
-                    <span className="text-2xl font-semibold">${product.price}</span>
-                    <Button icon="pi pi-shopping-cart" className="p-button-rounded" disabled={product.inventoryStatus === 'OUTOFSTOCK'}></Button>
-                </div> */}
             </div>
         </div>
         </div>
@@ -123,9 +118,12 @@ function App() {
         <h1>
           Visual Novel Recommender
         </h1>
+        {/* Link to github repo */}
         <i className='pi pi-github' style={{ fontSize: '2.0rem' }} onClick={()=>{githubRedirect()}}></i>
+        <br/>
+        {/* Username form */}
         <form onSubmit={formik.handleSubmit}>
-          <br/>
+          {/* Username text box */}
           <label htmlFor='username'>username</label>
           <span className="p-float-label">
             <InputText
@@ -136,10 +134,24 @@ function App() {
               value={formik.values.username}
             />
           </span>
+          {/* Toggle on/off NSFW suggestions */}
+          <label>
+            <input
+              type="checkbox"
+              name="allowNSFW"
+              onChange={formik.handleChange}
+              checked={formik.values.agreeToTerms}
+            />
+            NSFW
+          </label>
+          <br/>
+          <br/>
+
           <Toast ref={toast} />
           <Button type="submit">Submit</Button>
         </form>
         <br/>
+        {/* Displays a list of visual novels upon completion */}
         {showVNS ? <SuggestedVNS/> : null}
       </header>
     </div>
