@@ -16,7 +16,7 @@ export function getSuggestedVNS(tags, callback) {
         , ["tag","=",tags[7]]
         , ["tag","=",tags[8]]
         , ["tag","=",tags[9]] ],
-        fields: "title, length, tags.name, image.url, popularity",
+        fields: "id, title, length, tags.name, description, rating, image.url, popularity",
         results: 10
     };
 

@@ -78,10 +78,12 @@ function App() {
     }
   }
 
+  // Simple redirect link to the Github repo
   const githubRedirect = (e) => {
     window.location.href = "https://github.com/aag5734/VNDBRecommender";
   }
 
+  // Form object
   const formik = useFormik({
     initialValues: {
       username: '',
@@ -94,14 +96,20 @@ function App() {
     return (
       <div className="col-12">
         <div className="flex flex-column xl:flex-row xl:align-items-start p-4 gap-4">
-            <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round" src={vn.image.url} alt={vn.title} />
+            <img className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round hover:border-red-600 border-transparent border-2 cursor-pointer" src={vn.image.url} alt={vn.title} onClick={() => window.open(`https://vndb.org/${vn.id}`, '_blank')}/>
             <div className="flex flex-column sm:flex-row justify-content-between align-items-center xl:align-items-start flex-1 gap-4">
                 <div className="flex flex-column align-items-center sm:align-items-start gap-3">
                     <div className="text-2xl font-bold text-900">{vn.title}</div>
+                    <div className="text-xl font-bold text-900">{vn.rating ? (vn.rating / 10).toFixed(2) : 0}/10</div>
+                    <div className="text-left text-lg font-regular text-400 break-all">
+                      {vn.description ? vn.description.split('\n').map((paragraph, index) => (
+                          <p key={index} className="mb-4">{paragraph}</p>
+                      )) : ''}
+                    </div>
                 </div>
             </div>
         </div>
-        </div>
+      </div>
     );
   }
 
@@ -119,7 +127,7 @@ function App() {
           Visual Novel Recommender
         </h1>
         {/* Link to github repo */}
-        <i className='pi pi-github' style={{ fontSize: '2.0rem' }} onClick={()=>{githubRedirect()}}></i>
+        <i className='pi pi-github hover: cursor-pointer' style={{ fontSize: '2.0rem' }} onClick={()=>{githubRedirect()}}></i>
         <br/>
         {/* Username form */}
         <form onSubmit={formik.handleSubmit}>
@@ -146,7 +154,6 @@ function App() {
           </label>
           <br/>
           <br/>
-
           <Toast ref={toast} />
           <Button type="submit">Submit</Button>
         </form>
